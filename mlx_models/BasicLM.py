@@ -90,7 +90,7 @@ def train(
         inputs, targets = map(mx.array, to_samples(context_size, dataset))
         loss = 0
         for s in range(0, targets.shape[0], batch_size):
-            bx, by = inputs[s : s + batch_size], targets[s : s + batch_size]
+            bx, by = inputs[s: s + batch_size], targets[s: s + batch_size]
             bx, by = map(mx.array, (bx, by))
             losses = loss_fn(model, bx, by, reduce=False)
             loss += mx.sum(losses).item()

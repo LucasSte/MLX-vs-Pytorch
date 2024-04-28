@@ -11,12 +11,12 @@ import math
 
 class TransformerLM(nn.Module):
     def __init__(
-            self,
-            vocab_size: int,
-            num_layers: int,
-            dims: int,
-            num_heads: int,
-            checkpoint: bool,
+        self,
+        vocab_size: int,
+        num_layers: int,
+        dims: int,
+        num_heads: int,
+        checkpoint: bool,
     ):
         super().__init__()
 
@@ -55,20 +55,28 @@ def iterate_batches(batch_size, context_size, dataset):
         if s == 0:
             # Reset permutation:
             perm = np.random.permutation(inputs.shape[0])
-        ids = perm[s: s + batch_size]
+        ids = perm[s : s + batch_size]
         yield inputs[ids], targets[ids]
         s += batch_size
         if s >= inputs.shape[0]:
             s = 0
 
 
-def train(num_blocks, batch_size,
-          context_size, dim, num_heads, checkpoint, learning_rate, weight_decay, num_iters, lr_warmup):
+def train(
+    num_blocks,
+    batch_size,
+    context_size,
+    dim,
+    num_heads,
+    checkpoint,
+    learning_rate,
+    weight_decay,
+    num_iters,
+    lr_warmup,
+):
     vocab, train, valid, test = load_ptb()
 
-    model = TransformerLM(
-        len(vocab), num_blocks, dim, num_heads, checkpoint
-    )
+    model = TransformerLM(len(vocab), num_blocks, dim, num_heads, checkpoint)
     mx.eval(model.parameters())
 
     def loss_fn(model, x, y, reduce=True):
@@ -76,15 +84,13 @@ def train(num_blocks, batch_size,
         losses = nn.losses.cross_entropy(logits, y)
         return mx.mean(losses) if reduce else mx.mean(losses, axis=(-1, -2))
 
-    optimizer = optim.AdamW(
-        learning_rate=learning_rate, weight_decay=weight_decay
-    )
+    optimizer = optim.AdamW(learning_rate=learning_rate, weight_decay=weight_decay)
 
     def eval_fn(dataset):
         inputs, targets = map(mx.array, to_samples(context_size, dataset))
         loss = 0
         for s in range(0, targets.shape[0], batch_size):
-            bx, by = inputs[s: s + batch_size], targets[s: s + batch_size]
+            bx, by = inputs[s : s + batch_size], targets[s : s + batch_size]
             bx, by = map(mx.array, (bx, by))
             losses = loss_fn(model, bx, by, reduce=False)
             loss += mx.sum(losses).item()
@@ -111,9 +117,7 @@ def train(num_blocks, batch_size,
         # concatenate everything to an array of strings and print at the end.
         if (it + 1) % 5 == 0:
             train_loss = np.mean(losses)
-            print(
-                f"Iter {it + 1}: Train loss {train_loss:.3f}, "
-            )
+            print(f"Iter {it + 1}: Train loss {train_loss:.3f}, ")
             val_loss = eval_fn(valid)
             print(
                 f"Iter {it + 1}: "

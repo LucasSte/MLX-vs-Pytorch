@@ -26,20 +26,19 @@ def load_ptb():
                 request.urlretrieve(base_url + file_name, save_path)
 
     # Loading
-    with open(os.path.join(save_dir, contents[0]), 'r') as f:
-        vocab = set(t for l in f.readlines() for t in l.strip().split(' '))
+    with open(os.path.join(save_dir, contents[0]), "r") as f:
+        vocab = set(t for l in f.readlines() for t in l.strip().split(" "))
     eos = "<eos>"
     vocab.add(eos)
     vocab = {v: i for i, v in enumerate(vocab)}
 
     def to_array(dataset):
-        with open(os.path.join(save_dir, dataset), 'r') as f:
-            lines = (l.strip().split(' ') for l in f.readlines())
+        with open(os.path.join(save_dir, dataset), "r") as f:
+            lines = (l.strip().split(" ") for l in f.readlines())
         return np.array(
             [vocab[w] for line in lines for w in itertools.chain(line, [eos])],
-            dtype=np.uint32
+            dtype=np.uint32,
         )
 
     datasets = [to_array(fn) for fn in contents]
     return vocab, *datasets
-

@@ -29,7 +29,7 @@ class TransformerLM(nn.Module):
 
     def __call__(self, x):
         l_shape = x.shape[1]
-        mask = nn.MultiHeadAttention.create_additive_causal_mask(L)
+        mask = nn.MultiHeadAttention.create_additive_causal_mask(l_shape)
         x = self.embedding(x)
         x = x + self.pe(mx.arange(l_shape))
         x = self.transformer(x, mask)
@@ -55,7 +55,7 @@ def iterate_batches(batch_size, context_size, dataset):
         if s == 0:
             # Reset permutation:
             perm = np.random.permutation(inputs.shape[0])
-        ids = perm[s : s + batch_size]
+        ids = perm[s: s + batch_size]
         yield inputs[ids], targets[ids]
         s += batch_size
         if s >= inputs.shape[0]:

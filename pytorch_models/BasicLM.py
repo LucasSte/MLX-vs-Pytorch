@@ -6,6 +6,8 @@ from dataset.simple_transformers import load_ptb
 from mlx_models.BasicLM import to_samples, iterate_batches
 import numpy as np
 
+mps_dev = torch.device('mps')
+
 
 # Adapted from
 # https://github.com/ml-explore/mlx/blob/c4a471c99d0c6e6b085ff944ffef149905296a14/python/mlx/nn/layers/positional_encoding.py#L57
@@ -20,9 +22,9 @@ class SinusoidalPositionalEncoding(nn.Module):
         full_turns: bool = False,
     ):
         super().__init__()
-        one_zero = 1 - torch.arange(0, dims // 2) / (dims // 2 - 1)
-        min_freq = math.log(min_freq)
-        max_freq = math.log(max_freq)
+        one_zero = 1 - torch.arange(0, dims // 2, device=mps_dev) / (dims // 2 - 1)
+        min_freq = torch.log(torch.tensor(min_freq))
+        max_freq = torch.log(torch.tensor(max_freq))
 
         self._sigmas = torch.exp(one_zero * (max_freq - min_freq) + min_freq)
         if full_turns:
@@ -80,13 +82,13 @@ class TransformerLM(nn.Module):
         l_shape = x.shape[1]
         mask = self.create_additive_causal_mask(l_shape)
         x = self.embedding(x)
-        x = x + self.pe(torch.arange(l_shape))
+        x = x + self.pe(torch.arange(l_shape, device=mps_dev))
         x = self.transformer(x, mask)
         return self.out_proj(x)
 
 
 def mps_tensor(x):
-    return torch.tensor(x, device=torch.device("mps"))
+    return torch.tensor(x, device=mps_dev)
 
 
 def train(
@@ -100,9 +102,10 @@ def train(
     weight_decay,
     num_iters,
     lr_warmup,
+    ptb_data
 ):
-    vocab, train, valid, test = load_ptb()
-    model = TransformerLM(len(vocab), num_blocks, dim, num_heads, checkpoint)
+    vocab, train, valid, test = ptb_data
+    model = TransformerLM(len(vocab), num_blocks, dim, num_heads, checkpoint).to(mps_dev)
 
     def loss_fn(model, x, y, reduce=True):
         logits = model(x)
@@ -118,7 +121,7 @@ def train(
         loss = 0
         model.train(False)
         with torch.no_grad():
-            for s in range(0, targets.shape[0], batch_size):
+            for s in range(0, min(targets.shape[0], 1024), batch_size):
                 bx, by = inputs[s : s + batch_size], targets[s : s + batch_size]
                 losses = loss_fn(model, bx, by, reduce=False)
                 loss += torch.sum(losses).item()
@@ -127,7 +130,7 @@ def train(
     lr_lambda = lambda epoch: min(1, epoch / lr_warmup) * learning_rate
     scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lr_lambda)
 
-    @torch.compile
+    # @torch.compile
     def step(inputs, targets, it):
         optimizer.zero_grad()
         loss = loss_fn(model, inputs, targets)
@@ -138,19 +141,22 @@ def train(
     losses = []
     for it, (inputs, targets) in zip(range(num_iters), train_iterator):
         model.train(True)
-        inputs, targets = map(mps_tensor, (inputs, targets))
+        inputs = torch.tensor(inputs, dtype=torch.int32, device=mps_dev)
+        targets = torch.tensor(targets, device=mps_dev, dtype=torch.int32)
+        # inputs, targets = map(mps_tensor, (inputs, targets))
         loss = step(inputs, targets, it)
         losses.append(loss.item())
-
-        if (it + 1) % 5 == 0:
-            train_loss = np.mean(losses)
-            print(f"Iter {it + 1}: Train loss {train_loss:.3f}, ")
-            val_loss = eval_fn(valid)
-            print(
-                f"Iter {it + 1}: "
-                f"Val loss {val_loss:.3f}, "
-                f"Val ppl {math.exp(val_loss):.3f}, "
-            )
+        # TODO: Remove prints when everything is working.
+        # concatenate everything to an array of strings and print at the end.
+        # if (it + 1) % 5 == 0:
+        train_loss = np.mean(losses)
+        print(f"Iter {it + 1}: Train loss {train_loss:.3f}, ")
+        val_loss = eval_fn(valid)
+        print(
+            f"Iter {it + 1}: "
+            f"Val loss {val_loss:.3f}, "
+            f"Val ppl {math.exp(val_loss):.3f}, "
+        )
 
     test_loss = eval_fn(test)
     test_ppl = math.exp(test_loss)

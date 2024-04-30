@@ -8,14 +8,18 @@ import itertools
 
 # Loading function copied from: https://github.com/ml-explore/mlx-examples/blob/main/transformer_lm/datasets.py
 def load_ptb():
-    current_dir = str(pathlib.Path(__file__).parent.resolve())
-    save_dir = current_dir + "/tmp/ptb"
+    current_dir = pathlib.Path(__file__).parent.resolve()
+    parent_save_dir = os.path.join(current_dir, "tmp")
+    save_dir = os.path.join(parent_save_dir, "ptb")
 
     contents = [
         "ptb.train.txt",
         "ptb.valid.txt",
         "ptb.test.txt",
     ]
+
+    if not os.path.exists(parent_save_dir):
+        os.mkdir(parent_save_dir)
 
     if not os.path.exists(save_dir):
         os.mkdir(save_dir)

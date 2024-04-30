@@ -1,6 +1,5 @@
 # File copied (and slightly modified) from: https://github.com/ml-explore/mlx-examples/blob/main/transformer_lm/main.py
 
-from dataset.simple_transformers import load_ptb
 import mlx.nn as nn
 import mlx.core as mx
 import mlx.optimizers as optim
@@ -73,8 +72,10 @@ def train(
     weight_decay,
     num_iters,
     lr_warmup,
+    ptb_data
 ):
-    vocab, train, valid, test = load_ptb()
+    mx.set_default_device(mx.gpu)
+    vocab, train, valid, test = ptb_data
 
     model = TransformerLM(len(vocab), num_blocks, dim, num_heads, checkpoint)
     mx.eval(model.parameters())
@@ -89,7 +90,7 @@ def train(
     def eval_fn(dataset):
         inputs, targets = map(mx.array, to_samples(context_size, dataset))
         loss = 0
-        for s in range(0, targets.shape[0], batch_size):
+        for s in range(0, min(targets.shape[0], 1024), batch_size):
             bx, by = inputs[s: s + batch_size], targets[s: s + batch_size]
             bx, by = map(mx.array, (bx, by))
             losses = loss_fn(model, bx, by, reduce=False)
@@ -115,15 +116,15 @@ def train(
         losses.append(loss.item())
         # TODO: Remove prints when everything is working.
         # concatenate everything to an array of strings and print at the end.
-        if (it + 1) % 5 == 0:
-            train_loss = np.mean(losses)
-            print(f"Iter {it + 1}: Train loss {train_loss:.3f}, ")
-            val_loss = eval_fn(valid)
-            print(
-                f"Iter {it + 1}: "
-                f"Val loss {val_loss:.3f}, "
-                f"Val ppl {math.exp(val_loss):.3f}, "
-            )
+        #if (it + 1) % 5 == 0:
+        train_loss = np.mean(losses)
+        print(f"Iter {it + 1}: Train loss {train_loss:.3f}, ")
+        val_loss = eval_fn(valid)
+        print(
+            f"Iter {it + 1}: "
+            f"Val loss {val_loss:.3f}, "
+            f"Val ppl {math.exp(val_loss):.3f}, "
+        )
 
     test_loss = eval_fn(test)
     test_ppl = math.exp(test_loss)

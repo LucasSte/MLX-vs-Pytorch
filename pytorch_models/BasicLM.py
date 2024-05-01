@@ -64,7 +64,7 @@ class TransformerLM(nn.Module):
         self.pe = SinusoidalPositionalEncoding(dims)
 
         encoder_layer = nn.TransformerEncoderLayer(
-            dims, nhead=num_heads, dim_feedforward=dims * 4, norm_first=True
+            dims, nhead=num_heads, dim_feedforward=dims * 4, norm_first=True, batch_first=True
         )
         self.transformer = nn.TransformerEncoder(encoder_layer, num_layers=num_layers)
         self.out_proj = nn.Linear(dims, vocab_size)
@@ -73,7 +73,7 @@ class TransformerLM(nn.Module):
     def create_additive_causal_mask(N: int, dtype: torch.dtype = torch.float32):
         # Adapted from
         # https://github.com/ml-explore/mlx/blob/c4a471c99d0c6e6b085ff944ffef149905296a14/python/mlx/nn/layers/transformer.py#L102
-        indices = torch.arange(N)
+        indices = torch.arange(N, device=mps_dev)
         mask = indices[:, None] < indices[None]
         mask = mask.to(dtype) * -1e9
         return mask
@@ -107,23 +107,25 @@ def train(
     vocab, train, valid, test = ptb_data
     model = TransformerLM(len(vocab), num_blocks, dim, num_heads, checkpoint).to(mps_dev)
 
-    def loss_fn(model, x, y, reduce=True):
+    def loss_fn(model, x, y):
         logits = model(x)
-        losses = nn.functional.cross_entropy(logits, y)
-        return torch.mean(losses) if reduce else torch.mean(losses, dim=(-1, -2))
+        losses = nn.functional.cross_entropy(logits.permute(0, 2, 1), y)
+        return losses
 
     optimizer = torch.optim.AdamW(
         model.parameters(), lr=learning_rate, weight_decay=weight_decay
     )
 
     def eval_fn(dataset):
-        inputs, targets = map(mps_tensor, to_samples(context_size, dataset))
+        inputs, targets = to_samples(context_size, dataset)
+        inputs = torch.tensor(inputs, dtype=torch.int32, device=mps_dev)
+        targets = torch.tensor(targets, dtype=torch.int32, device=mps_dev)
         loss = 0
         model.train(False)
         with torch.no_grad():
             for s in range(0, min(targets.shape[0], 1024), batch_size):
                 bx, by = inputs[s : s + batch_size], targets[s : s + batch_size]
-                losses = loss_fn(model, bx, by, reduce=False)
+                losses = loss_fn(model, bx, by)
                 loss += torch.sum(losses).item()
         return loss / len(targets)
 
@@ -136,6 +138,7 @@ def train(
         loss = loss_fn(model, inputs, targets)
         loss.backward()
         scheduler.step(it)
+        return loss
 
     train_iterator = iterate_batches(batch_size, context_size, train)
     losses = []
@@ -143,12 +146,8 @@ def train(
         model.train(True)
         inputs = torch.tensor(inputs, dtype=torch.int32, device=mps_dev)
         targets = torch.tensor(targets, device=mps_dev, dtype=torch.int32)
-        # inputs, targets = map(mps_tensor, (inputs, targets))
         loss = step(inputs, targets, it)
         losses.append(loss.item())
-        # TODO: Remove prints when everything is working.
-        # concatenate everything to an array of strings and print at the end.
-        # if (it + 1) % 5 == 0:
         train_loss = np.mean(losses)
         print(f"Iter {it + 1}: Train loss {train_loss:.3f}, ")
         val_loss = eval_fn(valid)

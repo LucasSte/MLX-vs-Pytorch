@@ -17,7 +17,7 @@ if __name__ == '__main__':
     data = load_ptb()
 
     start = time.time()
-    pytorch_train(num_blocks, batch_size, context_size, dim, num_heads, False,
+    mlx_train(num_blocks, batch_size, context_size, dim, num_heads, False,
               learning_rate, weight_decay, num_iters, lr_warmup, data)
     end = time.time()
     print(f"MLX time: {end - start}s")

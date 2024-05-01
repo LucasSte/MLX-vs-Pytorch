@@ -80,10 +80,10 @@ def train(
     model = TransformerLM(len(vocab), num_blocks, dim, num_heads, checkpoint)
     mx.eval(model.parameters())
 
-    def loss_fn(model, x, y, reduce=True):
+    def loss_fn(model, x, y):
         logits = model(x)
         losses = nn.losses.cross_entropy(logits, y)
-        return mx.mean(losses) if reduce else mx.mean(losses, axis=(-1, -2))
+        return mx.mean(losses)
 
     optimizer = optim.AdamW(learning_rate=learning_rate, weight_decay=weight_decay)
 
@@ -93,13 +93,13 @@ def train(
         for s in range(0, min(targets.shape[0], 1024), batch_size):
             bx, by = inputs[s: s + batch_size], targets[s: s + batch_size]
             bx, by = map(mx.array, (bx, by))
-            losses = loss_fn(model, bx, by, reduce=False)
+            losses = loss_fn(model, bx, by)
             loss += mx.sum(losses).item()
         return loss / len(targets)
 
     state = [model.state, optimizer.state]
 
-    @partial(mx.compile, inputs=state, outputs=state)
+    # @partial(mx.compile, inputs=state, outputs=state)
     def step(inputs, targets):
         loss_and_grad_fn = nn.value_and_grad(model, loss_fn)
         loss, grads = loss_and_grad_fn(model, inputs, targets)
@@ -114,9 +114,6 @@ def train(
         loss = step(inputs, targets)
         mx.eval(state)
         losses.append(loss.item())
-        # TODO: Remove prints when everything is working.
-        # concatenate everything to an array of strings and print at the end.
-        #if (it + 1) % 5 == 0:
         train_loss = np.mean(losses)
         print(f"Iter {it + 1}: Train loss {train_loss:.3f}, ")
         val_loss = eval_fn(valid)

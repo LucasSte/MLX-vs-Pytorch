@@ -3,6 +3,10 @@ from collections import OrderedDict
 import torch
 import torch.nn as nn
 import math
+from transformers import AutoTokenizer
+from torch.utils.data import DataLoader
+
+device = torch.device("mps")
 
 
 class Config(object):
@@ -119,7 +123,7 @@ class Transformer(nn.Module):
         k = self.split_heads(k, self.num_attention_heads, self.attention_head_size)
         v = self.split_heads(v, self.num_attention_heads, self.attention_head_size)
 
-        a = self.attn(q, k, v, attention_mask)
+        a = self.attention(q, k, v, attention_mask)
         a = self.merge_heads(a, self.num_attention_heads, self.attention_head_size)
         a = self.attn_out(a)
         a = self.dropout(a)
@@ -217,3 +221,73 @@ class BertFineTuneTask(nn.Module):
         lin = self.linear1(concat)
         loss = self.loss_func(lin, ground_truth)
         return loss
+
+
+def tokenize_sentence_pair_dataset(dataset, tokenizer, max_length=512):
+    tokenized_dataset = []
+    for i in range(0, len(dataset[0])):
+        tokenized_dataset.append(
+            (
+                tokenizer(
+                    [dataset[0][i], dataset[1][i]],
+                    return_tensors="pt",
+                    padding="max_length",
+                    max_length=max_length,
+                    truncation=True,
+                ),
+                torch.tensor(dataset[2][i], dtype=torch.float32),
+            )
+        )
+
+    return tokenized_dataset
+
+
+def train_loop(model, optimizer, train_dataloader, num_epochs, val_dataloader):
+    model.to(device)
+    model.train(True)
+
+    for epoch in range(num_epochs):
+        print(f"Epoch {epoch + 1} out of {num_epochs}")
+        epoch_loss = 0
+        for item in iter(train_dataloader):
+            optimizer.zero_grad()
+
+            ids = item[0]["input_ids"].to(device)
+            mask = item[0]["attention_mask"].to(device)
+            truth = item[1].to(device)
+
+            loss = model(ids, mask, truth)
+            epoch_loss += loss
+            loss.backward()
+            optimizer.step()
+
+        print(f"epoch loss: {epoch_loss}")
+        dev_loss = 0
+        with torch.no_grad():
+            for item in iter(val_dataloader):
+                ids = item[0]["input_ids"].to(device)
+                mask = item[0]["attention_mask"].to(device)
+                truth = item[1].to(device)
+
+                loss = model(ids, mask, truth)
+                dev_loss += loss
+        print(f"validation loss: {dev_loss}")
+        print()
+
+
+def train(num_epochs, batch_size, num_labels, bert_config, lr, dataset):
+    model_name = "prajjwal1/bert-tiny"
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    tokenized_train = tokenize_sentence_pair_dataset(
+        dataset["train"][:50000], tokenizer, max_length=128
+    )
+    tokenized_val = tokenize_sentence_pair_dataset(
+        dataset["dev"], tokenizer, max_length=128
+    )
+
+    train_dataloader = DataLoader(tokenized_train, batch_size=batch_size, shuffle=False)
+    val_dataloader = DataLoader(tokenized_val, batch_size=batch_size, shuffle=False)
+
+    bert_model = BertFineTuneTask(num_labels, bert_config)
+    optimizer = torch.optim.AdamW(bert_model.parameters(), lr=lr)
+    train_loop(bert_model, optimizer, train_dataloader, num_epochs, val_dataloader)

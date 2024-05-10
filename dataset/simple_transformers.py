@@ -23,11 +23,12 @@ def load_ptb():
 
     if not os.path.exists(save_dir):
         os.mkdir(save_dir)
-        base_url = "https://raw.githubusercontent.com/wojzaremba/lstm/master/data/"
-        for file_name in contents:
-            save_path = os.path.join(save_dir, file_name)
-            if not os.path.exists(save_path):
-                request.urlretrieve(base_url + file_name, save_path)
+
+    base_url = "https://raw.githubusercontent.com/wojzaremba/lstm/master/data/"
+    for file_name in contents:
+        save_path = os.path.join(save_dir, file_name)
+        if not os.path.exists(save_path):
+            request.urlretrieve(base_url + file_name, save_path)
 
     # Loading
     with open(os.path.join(save_dir, contents[0]), "r") as f:

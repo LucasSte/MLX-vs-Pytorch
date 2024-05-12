@@ -1,5 +1,6 @@
 from dataset.BERT import load_nli
 from pytorch_models.MiniBERT import train as torch_train
+from mlx_models.MiniBERT import train as mlx_train
 import time
 
 num_epochs = 3
@@ -18,6 +19,6 @@ if __name__ == "__main__":
     dataset = load_nli()
 
     start = time.time()
-    torch_train(num_epochs, batch_size, num_labels, bert_config, lr, dataset)
+    mlx_train(num_epochs, batch_size, num_labels, bert_config, lr, dataset)
     end = time.time()
     print(f"MLX time: {end - start}s")

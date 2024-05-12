@@ -1,5 +1,9 @@
 import math
-from collections import OrderedDict
+
+import mlx.optimizers
+import numpy as np
+from transformers import AutoTokenizer
+from torch.utils.data import DataLoader
 
 import mlx.nn as nn
 import mlx.core as mx
@@ -72,7 +76,7 @@ class Transformer(nn.Module):
         mask = mx.expand_dims(mask, 1)
         mask = mx.expand_dims(mask, 2)
 
-        weights = mx.matmul(q, k.transpose(-2, -1))
+        weights = mx.matmul(q, k.transpose(0, 1, 3, 2))
         weights = weights / math.sqrt(self.attention_head_size)
         weights = mx.where(mask, weights, float(-1e9))
 
@@ -125,7 +129,7 @@ class MiniBert(nn.Module):
         ]
 
         self.pooler = nn.Sequential(
-            (nn.Linear(self.config.hidden_size, self.config.hidden_size), nn.Tanh())
+            nn.Linear(self.config.hidden_size, self.config.hidden_size), nn.Tanh()
         )
 
     def __call__(self, input_ids, attention_mask=None, token_type_ids=None):
@@ -159,7 +163,7 @@ class BertFineTuneTask(nn.Module):
         self.bert = MiniBert(bert_config)
         self.linear1 = nn.Linear(3 * self.bert.config.hidden_size, num_labels)
 
-    def __call__(self, input_ids, attention_mask, ground_truth):
+    def __call__(self, input_ids, attention_mask):
         input_ids = input_ids.reshape(input_ids.shape[0] * 2, input_ids.shape[2])
         attention_mask = attention_mask.reshape(
             attention_mask.shape[0] * 2, attention_mask.shape[2]
@@ -175,5 +179,84 @@ class BertFineTuneTask(nn.Module):
         )
 
         lin = self.linear1(concat)
-        loss = nn.losses.cross_entropy(lin, ground_truth, reduction="mean")
+        return lin
+
+
+def tokenize_sentence_pair_dataset(dataset, tokenizer, max_length=512):
+    tokenized_dataset = []
+    for i in range(0, len(dataset[0])):
+        tokenized_dataset.append(
+            (
+                tokenizer(
+                    [dataset[0][i], dataset[1][i]],
+                    return_tensors="np",
+                    padding="max_length",
+                    max_length=max_length,
+                    truncation=True,
+                ),
+                np.array(dataset[2][i]),
+            )
+        )
+    return tokenized_dataset
+
+
+def train_loop(model, optimizer, train_dataloader, num_epochs, val_dataloader):
+    mx.eval(model.parameters())
+    state = [model.state, optimizer.state]
+
+    def loss_fn(model, x, y):
+        input_ids, attention_mask = x
+        embeds = model(input_ids, attention_mask)
+        losses = nn.losses.cross_entropy(embeds, y, reduction="mean")
+        return losses
+
+    def step(inputs, targets):
+        loss_and_grad_fn = nn.value_and_grad(model, loss_fn)
+        loss, grads = loss_and_grad_fn(model, inputs, targets)
+        optimizer.update(model, grads)
         return loss
+
+    for epoch in range(num_epochs):
+        print(f"Epoch {epoch + 1} out of {num_epochs}")
+        epoch_loss = 0
+        for item in iter(train_dataloader):
+            # From Pytorch tensor to numpy, there is no copy.
+            ids = mx.array(item[0]["input_ids"].numpy())
+            mask = mx.array(item[0]["attention_mask"].numpy())
+            truth = mx.array(item[1].numpy())
+
+            loss = step((ids, mask), truth)
+            mx.eval(state)
+            epoch_loss += loss.item()
+
+        print(f"epoch loss: {epoch_loss}")
+        dev_loss = 0
+
+        for item in iter(val_dataloader):
+            ids = mx.array(item[0]["input_ids"].numpy())
+            mask = mx.array(item[0]["attention_mask"].numpy())
+            truth = mx.array(item[1].numpy())
+
+            loss = loss_fn(model, (ids, mask), truth)
+            dev_loss += loss.item()
+        print(f"validation loss: {dev_loss}")
+        print()
+
+
+def train(num_epochs, batch_size, num_labels, bert_config, lr, dataset):
+    mx.set_default_device(mx.gpu)
+    model_name = "prajjwal1/bert-tiny"
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    tokenized_train = tokenize_sentence_pair_dataset(
+        dataset["train"][:50000], tokenizer, max_length=128
+    )
+    tokenized_val = tokenize_sentence_pair_dataset(
+        dataset["dev"], tokenizer, max_length=128
+    )
+
+    train_dataloader = DataLoader(tokenized_train, batch_size=batch_size, shuffle=False)
+    val_dataloader = DataLoader(tokenized_val, batch_size=batch_size, shuffle=False)
+
+    bert_model = BertFineTuneTask(num_labels, bert_config)
+    optimizer = mlx.optimizers.AdamW(learning_rate=lr)
+    train_loop(bert_model, optimizer, train_dataloader, num_epochs, val_dataloader)

@@ -5,7 +5,7 @@ import torch
 device = torch.device('cpu')
 ds = load_dataset("hf-internal-testing/librispeech_asr_dummy", "clean", split="validation")
 
-
+# TODO: Use pytorch built from sources
 for i in range(0, 50):
     audio_sample = ds[i]["audio"]
     waveform = audio_sample["array"]

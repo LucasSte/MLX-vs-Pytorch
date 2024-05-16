@@ -10,7 +10,7 @@ For training:
 
 For inference:
 1. Benchmark whisper (native)
-2. Benchmark LLama (or other LLM) through huggingface.
+2. Benchmark TinyLLama
 
 Extra:
 1. Switch between CPU and GPU

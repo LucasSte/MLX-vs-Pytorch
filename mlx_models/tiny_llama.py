@@ -1,6 +1,6 @@
 # File copied from https://github.com/ml-explore/mlx-examples/blob/main/llms/llama/llama.py
 # and modified for the benchmark
-
+import pathlib
 from dataclasses import dataclass
 import mlx.core as mx
 import mlx.nn as nn
@@ -10,6 +10,7 @@ from pathlib import Path
 import glob
 from sentencepiece import SentencePieceProcessor
 from mlx.utils import tree_unflatten
+import os
 
 
 @dataclass
@@ -194,15 +195,14 @@ class Llama(nn.Module):
 
 
 def generate(args, model, tokenizer):
-    input("Press enter to start generation")
-    print("------")
-    print(args.prompt)
+    # TODO: This is generating more tokens than needed
     x = mx.array([[tokenizer.bos_id()] + tokenizer.encode(args.prompt)])
     skip = 0
-    prompt_processing = None
     tokens = []
     for token in model.generate(x, args.temp):
         tokens.append(token)
+        if token.item() == 32002:
+            break
 
         if len(tokens) == 1:
             # Actually perform the computation to measure the prompt processing time
@@ -221,8 +221,6 @@ def generate(args, model, tokenizer):
     mx.eval(tokens)
     s = tokenizer.decode([t.item() for t in tokens])
     print(s[skip:], flush=True)
-    print("------")
-    print(prompt_processing)
 
 
 def sanitize_config(config, weights):
@@ -249,12 +247,10 @@ def load_model(model_path):
 
     unsharded_weights_path = Path(model_path / "weights.npz")
     if unsharded_weights_path.is_file():
-        print("[INFO] Loading model from {}.".format(unsharded_weights_path))
         weights = mx.load(str(unsharded_weights_path))
     else:
         sharded_weights_glob = str(model_path / "weights.*.npz")
         weight_files = glob.glob(sharded_weights_glob)
-        print("[INFO] Loading model from {}.".format(sharded_weights_glob))
 
         if len(weight_files) == 0:
             raise FileNotFoundError("No weights found in {}".format(model_path))
@@ -272,3 +268,34 @@ def load_model(model_path):
     model.update(tree_unflatten(list(weights.items())))
     tokenizer = SentencePieceProcessor(model_file=str(model_path / "tokenizer.model"))
     return model, tokenizer
+
+
+@dataclass
+class Args:
+    prompt: str
+    max_tokens: int
+    write_every: int
+    temp: float
+
+
+def run():
+    # TODO: Make this a class and loop over few prompts in the main file
+    current_dir = pathlib.Path(__file__).parent.resolve()
+    save_dir = os.path.join(current_dir, "tiny_llama")
+
+    mx.set_default_device(mx.gpu)
+    model, tokenizer = load_model(save_dir)
+
+    prompt = "How to get in a good university?"
+    formatted_prompt = (
+        f"<|im_start|>user\n{prompt}<|im_end|>\n<|im_start|>assistant\n"
+    )
+
+    args = Args(
+        temp=0.0,
+        write_every=1024,
+        max_tokens=1024,
+        prompt=formatted_prompt
+    )
+
+    generate(args, model, tokenizer)

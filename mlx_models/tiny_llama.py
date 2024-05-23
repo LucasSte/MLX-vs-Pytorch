@@ -201,7 +201,11 @@ def generate(args, model, tokenizer):
     tokens = []
     for token in model.generate(x, args.temp):
         tokens.append(token)
-        if token.item() == 32002:
+        if (
+            token.item() == 29958
+            and tokenizer.decode([t.item() for t in tokens[-7:]]) == "<|im_end|>"
+        ):
+            tokens = tokens[:-7]
             break
 
         if len(tokens) == 1:
@@ -287,15 +291,8 @@ def run():
     model, tokenizer = load_model(save_dir)
 
     prompt = "How to get in a good university?"
-    formatted_prompt = (
-        f"<|im_start|>user\n{prompt}<|im_end|>\n<|im_start|>assistant\n"
-    )
+    formatted_prompt = f"<|im_start|>user\n{prompt}<|im_end|>\n<|im_start|>assistant\n"
 
-    args = Args(
-        temp=0.0,
-        write_every=1024,
-        max_tokens=1024,
-        prompt=formatted_prompt
-    )
+    args = Args(temp=0.0, write_every=1024, max_tokens=1024, prompt=formatted_prompt)
 
     generate(args, model, tokenizer)

@@ -20,6 +20,9 @@ All connected to power and with performance mode enabled
 1. M1 Pro - 16 GPU cores
 2. M3 Max - 40 GPU cores
 
+Housekeeping:
+1. Ideally, I would have a script to download and set up the models :)
+2. Add requirements.txt
 
 # Can test with the latest main from both MLX and pytorch. This will give more
 # trustworthy result for future usage.

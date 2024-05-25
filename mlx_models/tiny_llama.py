@@ -194,10 +194,8 @@ class Llama(nn.Module):
             yield y
 
 
-def generate(args, model, tokenizer):
-    # TODO: This is generating more tokens than needed
+def generate(args, model, tokenizer) -> str:
     x = mx.array([[tokenizer.bos_id()] + tokenizer.encode(args.prompt)])
-    skip = 0
     tokens = []
     for token in model.generate(x, args.temp):
         tokens.append(token)
@@ -215,16 +213,9 @@ def generate(args, model, tokenizer):
         if len(tokens) >= args.max_tokens:
             break
 
-        elif (len(tokens) % args.write_every) == 0:
-            # It is perfectly ok to eval things we have already eval-ed.
-            mx.eval(tokens)
-            s = tokenizer.decode([t.item() for t in tokens])
-            print(s[skip:], end="", flush=True)
-            skip = len(s)
-
     mx.eval(tokens)
     s = tokenizer.decode([t.item() for t in tokens])
-    print(s[skip:], flush=True)
+    return s
 
 
 def sanitize_config(config, weights):
@@ -278,8 +269,31 @@ def load_model(model_path):
 class Args:
     prompt: str
     max_tokens: int
-    write_every: int
     temp: float
+
+
+class MLXLlama:
+    def __init__(self, max_tokens: int, temp: float, file: str):
+        self.max_tokens = max_tokens
+        self.temp = temp
+
+        current_dir = pathlib.Path(__file__).parent.resolve()
+        save_dir = os.path.join(current_dir, "tiny_llama")
+
+        mx.set_default_device(mx.gpu)
+        self.model, self.tokenizer = load_model(save_dir)
+        self.out_file = open(file, "w")
+
+    def generate_and_save(self, prompt: str):
+        formatted_prompt = (
+            f"<|im_start|>user\n{prompt}<|im_end|>\n<|im_start|>assistant\n"
+        )
+        args = Args(temp=self.temp, max_tokens=1024, prompt=formatted_prompt)
+        result = generate(args, self.model, self.tokenizer)
+        print(result, file=self.out_file, flush=True)
+
+    def finish(self):
+        self.out_file.close()
 
 
 def run():
@@ -293,6 +307,6 @@ def run():
     prompt = "How to get in a good university?"
     formatted_prompt = f"<|im_start|>user\n{prompt}<|im_end|>\n<|im_start|>assistant\n"
 
-    args = Args(temp=0.0, write_every=1024, max_tokens=1024, prompt=formatted_prompt)
+    args = Args(temp=0.0, max_tokens=1024, prompt=formatted_prompt)
 
     generate(args, model, tokenizer)

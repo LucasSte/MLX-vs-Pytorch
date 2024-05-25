@@ -294,19 +294,3 @@ class MLXLlama:
 
     def finish(self):
         self.out_file.close()
-
-
-def run():
-    # TODO: Make this a class and loop over few prompts in the main file
-    current_dir = pathlib.Path(__file__).parent.resolve()
-    save_dir = os.path.join(current_dir, "tiny_llama")
-
-    mx.set_default_device(mx.gpu)
-    model, tokenizer = load_model(save_dir)
-
-    prompt = "How to get in a good university?"
-    formatted_prompt = f"<|im_start|>user\n{prompt}<|im_end|>\n<|im_start|>assistant\n"
-
-    args = Args(temp=0.0, max_tokens=1024, prompt=formatted_prompt)
-
-    generate(args, model, tokenizer)

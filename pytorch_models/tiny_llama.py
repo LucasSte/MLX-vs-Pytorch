@@ -9,17 +9,9 @@ class TorchLLama:
     def __init__(
         self,
         max_tokens: int,
-        temp: float,
-        top_k: int,
-        top_p: float,
-        sample: bool,
         filename: str,
     ):
         self.max_tokens = max_tokens
-        self.temp = temp
-        self.top_k = top_k
-        self.top_p = top_p
-        self.sample = sample
         self.filename = filename
 
         model = "TinyLlama-1.1B-Chat-v1.0"
@@ -42,10 +34,7 @@ class TorchLLama:
         seqs = self.pipeline(
             formatted_prompt,
             max_new_tokens=self.max_tokens,
-            do_sample=self.sample,
-            temperature=self.temp,
-            top_k=self.top_k,
-            top_p=self.top_p,
+            do_sample=False,
         )
         print(seqs[0]["generated_text"], file=self.file, flush=True)
 

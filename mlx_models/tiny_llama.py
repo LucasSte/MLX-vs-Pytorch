@@ -273,9 +273,8 @@ class Args:
 
 
 class MLXLlama:
-    def __init__(self, max_tokens: int, temp: float, file: str):
+    def __init__(self, max_tokens: int, file: str):
         self.max_tokens = max_tokens
-        self.temp = temp
 
         current_dir = pathlib.Path(__file__).parent.resolve()
         save_dir = os.path.join(current_dir, "tiny_llama")
@@ -286,9 +285,11 @@ class MLXLlama:
 
     def generate_and_save(self, prompt: str):
         formatted_prompt = (
-            f"<|im_start|>user\n{prompt}<|im_end|>\n<|im_start|>assistant\n"
+            f"<|system|>\nYou are a friendly chatbot who always responds wisely</s>\n"
+            f"<|user|>\n{prompt}</s>\n"
+            "<|assistant|>"
         )
-        args = Args(temp=self.temp, max_tokens=1024, prompt=formatted_prompt)
+        args = Args(temp=0.0, max_tokens=1024, prompt=formatted_prompt)
         result = generate(args, self.model, self.tokenizer)
         print(result, file=self.out_file, flush=True)
 

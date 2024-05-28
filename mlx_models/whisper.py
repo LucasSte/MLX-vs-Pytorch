@@ -1,19 +1,36 @@
 import mlx_whisper
 from datasets import load_dataset
 import mlx.core as mx
+import pathlib
+import os
 
-ds = load_dataset(
-    "hf-internal-testing/librispeech_asr_dummy", "clean", split="validation"
-)
 
-mx.set_default_device(mx.gpu)
-# TODO: Be sure to use the fp-32 model
-for i in range(0, 50):
-    audio_sample = ds[i]["audio"]
-    waveform = audio_sample["array"]
-    sampling_rate = audio_sample["sampling_rate"]
+class MLXWhisper:
+    def __init__(self, iterations: int, filename: str):
+        self.dataset = load_dataset(
+            "hf-internal-testing/librispeech_asr_dummy", "clean", split="validation"
+        )
+        self.file = open(filename, "w")
+        model = "whisper_tiny_fp32"
+        current_dir = pathlib.Path(__file__).parent.resolve()
+        self.model_dir = os.path.join(current_dir, model)
 
-    text = mlx_whisper.transcribe(
-        waveform, path_or_hf_repo="./whisper_tiny_fp32", fp16=False
-    )["text"]
-    print(text)
+        self.iterations = 1
+        # This serves to load the model
+        self.generate()
+        self.file.truncate(0)
+
+        self.iterations = iterations
+
+    def generate(self):
+        mx.set_default_device(mx.gpu)
+        for i in range(0, self.iterations):
+            audio_sample = self.dataset[i]["audio"]
+            waveform = audio_sample["array"]
+            text = mlx_whisper.transcribe(
+                waveform, path_or_hf_repo=self.model_dir, fp16=False
+            )["text"]
+            print(text, file=self.file, flush=True)
+
+    def finish(self):
+        self.file.close()

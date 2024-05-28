@@ -1,20 +1,11 @@
-from mlx_models.tiny_llama import MLXLlama
-from pytorch_models.tiny_llama import TorchLLama
 import argparse
 import time
+from pytorch_models.whisper import TorchWhisper
+from mlx_models.whisper import MLXWhisper
 
-out_filename = "_llm_out.txt"
 
-prompts = [
-    "How to get in a good university?",
-    "What is artificial intelligence?",
-    "What is a computer?",
-    "How to land in an awesome job?",
-    "How to change the world?",
-]
-
-max_tokens = 1024
-
+iterations = 50
+out_filename = "_whisper.txt"
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Language model training benchmark")
@@ -30,18 +21,16 @@ if __name__ == "__main__":
         raise Exception("Unexpected option")
 
     if args.framework == "mlx":
-        mlx_model = MLXLlama(max_tokens, "mlx" + out_filename)
+        mlx_model = MLXWhisper(iterations, "mlx" + out_filename)
         start = time.time()
-        for item in prompts:
-            mlx_model.generate_and_save(item)
+        mlx_model.generate()
         end = time.time()
         mlx_model.finish()
         print(f"MLX time: {end - start}s")
     else:
-        torch_model = TorchLLama(max_tokens, "pytorch" + out_filename)
+        torch_model = TorchWhisper(iterations, "pytorch" + out_filename)
         start = time.time()
-        for item in prompts:
-            torch_model.generate_and_save(item)
+        torch_model.generate()
         end = time.time()
         torch_model.finish()
         print(f"Pytorch time: {end - start}s")

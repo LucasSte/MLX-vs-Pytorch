@@ -201,14 +201,10 @@ def generate(args, model, tokenizer) -> str:
         tokens.append(token)
         if (
             token.item() == 29958
-            and tokenizer.decode([t.item() for t in tokens[-7:]]) == "<|im_end|>"
+            and tokenizer.decode([t.item() for t in tokens[-5:]]) == "<|user|>"
         ):
-            tokens = tokens[:-7]
+            tokens = tokens[:-5]
             break
-
-        if len(tokens) == 1:
-            # Actually perform the computation to measure the prompt processing time
-            mx.eval(token)
 
         if len(tokens) >= args.max_tokens:
             break

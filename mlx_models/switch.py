@@ -1,44 +1,37 @@
 import mlx.core as mx
 import time
 
-res_1 = mx.random.uniform(shape=(10000, 10000), stream=mx.cpu)
-res_2 = mx.random.uniform(shape=(10000, 10000), stream=mx.cpu)
-res_3 = mx.random.uniform(shape=(10000, 10000), stream=mx.cpu)
+
+def multiply_and_divide(op1: mx.array, op2: mx.array, stream) -> mx.array:
+    mult = mx.matmul(op1, op2, stream=stream)
+    div = mx.divide(mult, mult.max(0, stream=stream), stream=stream)
+    return div
+
+
+def multiply_items(op1: mx.array, op2: mx.array, op3: mx.array, stream):
+    res_1 = multiply_and_divide(op1, op2, stream)
+    res_2 = multiply_and_divide(op2, op3, stream)
+    res_3 = multiply_and_divide(op3, op1, stream)
+    return res_1, res_2, res_3
+
+
+a = mx.random.uniform(shape=(10000, 10000), stream=mx.cpu)
+b = mx.random.uniform(shape=(10000, 10000), stream=mx.cpu)
+c = mx.random.uniform(shape=(10000, 10000), stream=mx.cpu)
 
 
 start = time.time()
+
 for _ in range(0, 50):
-    # TODO: This only copies the pointer, right?
-    a = res_1
-    b = res_2
-    c = res_3
-
-    mps_1 = mx.matmul(a, b, stream=mx.gpu)
-    mps_1 = mx.divide(mps_1, mps_1.max(0, stream=mx.gpu), stream=mx.gpu)
-    mps_2 = mx.matmul(b, c, stream=mx.gpu)
-    mps_2 = mx.divide(mps_2, mps_2.max(0, stream=mx.gpu), stream=mx.gpu)
-    mps_3 = mx.matmul(a, c, stream=mx.gpu)
-    mps_3 = mx.divide(mps_3, mps_3.max(0, stream=mx.gpu), stream=mx.gpu)
-
+    mps_1, mps_2, mps_3 = multiply_items(a, b, c, mx.gpu)
     mx.eval(mps_1, mps_2, mps_3)
+    a, b, c = multiply_items(mps_1, mps_2, mps_3, mx.cpu)
+    mx.eval(a, b, c)
 
-    # TODO: This only copies the pointer, right?
-    cpu_1 = mps_1
-    cpu_2 = mps_2
-    cpu_3 = mps_3
-
-    res_1 = mx.matmul(cpu_1, cpu_2, stream=mx.cpu)
-    res_1 = mx.divide(res_1, res_1.max(0, stream=mx.cpu), stream=mx.cpu)
-    res_2 = mx.matmul(cpu_2, cpu_3, stream=mx.cpu)
-    res_2 = mx.divide(res_2, res_2.max(0, stream=mx.cpu), stream=mx.cpu)
-    res_3 = mx.matmul(cpu_3, cpu_1, stream=mx.cpu)
-    res_3 = mx.divide(res_3, res_3.max(0, stream=mx.cpu), stream=mx.cpu)
-
-    mx.eval(res_1, res_2, res_3)
 end = time.time()
 
-print(res_1)
-print(res_2)
-print(res_3)
+print(a)
+print(b)
+print(c)
 
 print(f"Time: {end-start}")

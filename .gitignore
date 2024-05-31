@@ -1,2 +1,6 @@
 __pycache__/
 tmp/
+.venv/
+TinyLlama-1.1B-Chat-v1.0/
+tiny_llama/
+whisper_tiny_fp32/

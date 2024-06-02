@@ -1,7 +1,8 @@
 from dataset.simple_transformers import load_ptb
 from mlx_models.BasicLM import train as mlx_train
 from pytorch_models.BasicLM import train as pytorch_train
-import argparse
+from utils.initializer import initialize
+import numpy as np
 import time
 
 context_size = 1024
@@ -15,51 +16,51 @@ lr_warmup = 200
 batch_size = 32
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Language model training benchmark")
-    parser.add_argument(
-        "--framework",
-        help="Which framework to use: pytorch or mlx",
-        type=str,
-    )
-
-    args = parser.parse_args()
-
-    if args.framework not in ["pytorch", "mlx"]:
-        raise Exception("Unexpected option")
+    args, times = initialize()
 
     data = load_ptb()
 
-    if args.frameowork == "mlx":
-        start = time.time()
-        mlx_train(
-            num_blocks,
-            batch_size,
-            context_size,
-            dim,
-            num_heads,
-            False,
-            learning_rate,
-            weight_decay,
-            num_iters,
-            lr_warmup,
-            data,
-        )
-        end = time.time()
-        print(f"MLX time: {end - start}s")
-    else:
-        start = time.time()
-        pytorch_train(
-            num_blocks,
-            batch_size,
-            context_size,
-            dim,
-            num_heads,
-            False,
-            learning_rate,
-            weight_decay,
-            num_iters,
-            lr_warmup,
-            data,
-        )
-        end = time.time()
-        print(f"Pytorch time: {end - start}s")
+    for i in range(0, args.iter):
+        if args.frameowork == "mlx":
+            start = time.time()
+            mlx_train(
+                num_blocks,
+                batch_size,
+                context_size,
+                dim,
+                num_heads,
+                False,
+                learning_rate,
+                weight_decay,
+                num_iters,
+                lr_warmup,
+                data,
+            )
+            end = time.time()
+            elapsed = end - start
+            print(f"MLX time: {elapsed}s")
+            times[i] = elapsed
+        else:
+            start = time.time()
+            pytorch_train(
+                num_blocks,
+                batch_size,
+                context_size,
+                dim,
+                num_heads,
+                False,
+                learning_rate,
+                weight_decay,
+                num_iters,
+                lr_warmup,
+                data,
+            )
+            end = time.time()
+            elapsed = end - start
+            print(f"Pytorch time: {elapsed}s")
+            times[i] = elapsed
+
+    print(f"\nLLM train test: ran {args.iter} times")
+    print(
+        f"Framework: {args.framework}\n\tAverage: {np.mean(times)}s - Median: {np.median(times)}s"
+    )

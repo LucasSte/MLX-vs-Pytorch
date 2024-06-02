@@ -6,7 +6,7 @@ import os
 
 
 class MLXWhisper:
-    def __init__(self, iterations: int, filename: str):
+    def __init__(self, num_examples: int, filename: str):
         self.dataset = load_dataset(
             "hf-internal-testing/librispeech_asr_dummy", "clean", split="validation"
         )
@@ -20,11 +20,11 @@ class MLXWhisper:
         self.generate()
         self.file.truncate(0)
 
-        self.iterations = iterations
+        self.num_examples = num_examples
 
     def generate(self):
         mx.set_default_device(mx.gpu)
-        for i in range(0, self.iterations):
+        for i in range(0, self.num_examples):
             audio_sample = self.dataset[i]["audio"]
             waveform = audio_sample["array"]
             text = mlx_whisper.transcribe(

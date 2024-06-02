@@ -1,7 +1,8 @@
 from dataset.BERT import load_nli
-import argparse
+from utils.initializer import initialize
 from pytorch_models.MiniBERT import train as pytorch_train
 from mlx_models.MiniBERT import train as mlx_train
+import numpy as np
 import time
 
 num_epochs = 3
@@ -17,27 +18,29 @@ bert_config = {
 }
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Language model training benchmark")
-    parser.add_argument(
-        "--framework",
-        help="Which framework to use: pytorch or mlx",
-        type=str,
-    )
-
-    args = parser.parse_args()
-
-    if args.framework not in ["pytorch", "mlx"]:
-        raise Exception("Unexpected option")
+    args, times = initialize()
 
     dataset = load_nli()
 
-    if args.framework == "mlx":
-        start = time.time()
-        mlx_train(num_epochs, batch_size, num_labels, bert_config, lr, dataset)
-        end = time.time()
-        print(f"MLX time: {end - start}s")
-    else:
-        start = time.time()
-        pytorch_train(num_epochs, batch_size, num_labels, bert_config, lr, dataset)
-        end = time.time()
-        print(f"Pytorch time: {end - start}s")
+    for i in range(0, times):
+        if args.framework == "mlx":
+            start = time.time()
+            mlx_train(num_epochs, batch_size, num_labels, bert_config, lr, dataset)
+            end = time.time()
+
+            elapsed = end - start
+            times[i] = elapsed
+            print(f"MLX time: {elapsed}s")
+        else:
+            start = time.time()
+            pytorch_train(num_epochs, batch_size, num_labels, bert_config, lr, dataset)
+            end = time.time()
+
+            elapsed = end - start
+            times[i] = elapsed
+            print(f"Pytorch time: {elapsed}s")
+
+    print(f"\nBERT fine tune test: ran {args.iter} times")
+    print(
+        f"Framework: {args.framework}\n\tAverage: {np.mean(times)}s - Median: {np.median(times)}s"
+    )

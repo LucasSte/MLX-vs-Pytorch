@@ -6,8 +6,8 @@ device = torch.device("mps")
 
 
 class TorchWhisper:
-    def __init__(self, iterations: int, filename: str):
-        self.iterations = iterations
+    def __init__(self, num_examples: int, filename: str):
+        self.num_examples = num_examples
         self.dataset = load_dataset(
             "hf-internal-testing/librispeech_asr_dummy", "clean", split="validation"
         )
@@ -18,7 +18,7 @@ class TorchWhisper:
         self.file = open(filename, "w")
 
     def generate(self):
-        for i in range(0, self.iterations):
+        for i in range(0, self.num_examples):
             audio_sample = self.dataset[i]["audio"]
             waveform = audio_sample["array"]
             sampling_rate = audio_sample["sampling_rate"]

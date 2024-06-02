@@ -46,4 +46,6 @@ def run_test(iterations: int, size: int, filename: str):
         print(res_2, file=file, flush=True)
         print(res_3, file=file, flush=True)
 
-    print(f"Pytorch time: {end-start}")
+    duration = end - start
+    print(f"Pytorch time: {duration}")
+    return duration

@@ -15,7 +15,7 @@ def multiply_items(op1: mx.array, op2: mx.array, op3: mx.array, stream):
     return res_1, res_2, res_3
 
 
-def run_test(iterations: int, size: int, filename: str):
+def run_test(iterations: int, size: int, filename: str) -> float:
     a = mx.random.uniform(shape=(size, size), stream=mx.cpu, dtype=mx.float32)
     b = mx.random.uniform(shape=(size, size), stream=mx.cpu, dtype=mx.float32)
     c = mx.random.uniform(shape=(size, size), stream=mx.cpu, dtype=mx.float32)
@@ -35,4 +35,6 @@ def run_test(iterations: int, size: int, filename: str):
         print(b, file=file, flush=True)
         print(c, file=file, flush=True)
 
-    print(f"MLX time: {end-start}")
+    duration = end - start
+    print(f"MLX time: {duration}")
+    return duration

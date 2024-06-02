@@ -9,7 +9,7 @@ context_size = 1024
 num_blocks = 12
 dim = 1024
 num_heads = 16
-num_iters = 2
+epochs = 5
 learning_rate = 3e-4
 weight_decay = 1e-5
 lr_warmup = 200
@@ -21,7 +21,7 @@ if __name__ == "__main__":
     data = load_ptb()
 
     for i in range(0, args.iter):
-        if args.frameowork == "mlx":
+        if args.framework == "mlx":
             start = time.time()
             mlx_train(
                 num_blocks,
@@ -32,7 +32,7 @@ if __name__ == "__main__":
                 False,
                 learning_rate,
                 weight_decay,
-                num_iters,
+                epochs,
                 lr_warmup,
                 data,
             )
@@ -51,7 +51,7 @@ if __name__ == "__main__":
                 False,
                 learning_rate,
                 weight_decay,
-                num_iters,
+                epochs,
                 lr_warmup,
                 data,
             )

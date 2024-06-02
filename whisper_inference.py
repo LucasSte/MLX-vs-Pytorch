@@ -5,7 +5,7 @@ from mlx_models.whisper import MLXWhisper
 import numpy as np
 
 
-num_examples = 50
+num_examples = 70
 out_filename = "_whisper.txt"
 
 if __name__ == "__main__":

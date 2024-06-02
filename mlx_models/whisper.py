@@ -15,7 +15,7 @@ class MLXWhisper:
         current_dir = pathlib.Path(__file__).parent.resolve()
         self.model_dir = os.path.join(current_dir, model)
 
-        self.iterations = 1
+        self.num_examples = 1
         # This serves to load the model
         self.generate()
         self.file.truncate(0)

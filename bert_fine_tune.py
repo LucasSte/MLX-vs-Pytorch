@@ -5,7 +5,7 @@ from mlx_models.MiniBERT import train as mlx_train
 import numpy as np
 import time
 
-num_epochs = 3
+num_epochs = 5
 batch_size = 8
 num_labels = 3
 lr = 5e-5
@@ -22,7 +22,7 @@ if __name__ == "__main__":
 
     dataset = load_nli()
 
-    for i in range(0, times):
+    for i in range(0, args.iter):
         if args.framework == "mlx":
             start = time.time()
             mlx_train(num_epochs, batch_size, num_labels, bert_config, lr, dataset)

@@ -4,9 +4,10 @@ Benchmarks comparing the two frameworks on Apple Silicon GPUs
 # Use Black for formatting
 
 # TODO:
+
+------ M3 MAX ---------
 For training:
 1. Benchmark a simple transformers model from MLX example
-M3 MAX:
 5 epochs, 3 iter
 Framework: pytorch
 	Average: 912.5205717086792s - Median: 924.3736660480499s
@@ -41,6 +42,25 @@ Framework: mlx
 
 Extra:
 1. Switch between CPU and GPU
+Switch test: ran 10 times
+Framework: pytorch
+	Average: 146.35703275203704s - Median: 146.41792500019073s
+
+Framework: mlx
+	Average: 140.5102721452713s - Median: 140.51127195358276s
+
+------ M1 PRO ---------
+For training:
+1. Benchmark a simple transformers model from MLX example
+2. Benchmark training MINI BERT (from cohere)
+
+For inference:
+1. Benchmark whisper (native)
+2. Benchmark TinyLLama
+
+Extra:
+1. Switch between CPU and GPU
+
 
 Benchmark on:
 All connected to power and with performance mode enabled

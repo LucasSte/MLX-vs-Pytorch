@@ -52,15 +52,40 @@ Framework: mlx
 ------ M1 PRO ---------
 For training:
 1. Benchmark a simple transformers model from MLX example
-2. Benchmark training MINI BERT (from cohere)
+LLM train test: ran 3 times
+Framework: pytorch
+	Average: 1806.639595190684s - Median: 1818.6110489368439s
 
+Framework: mlx
+	Average: 1157.0066788196564s - Median: 1154.6633532047272s
+2. Benchmark training MINI BERT (from cohere)
+Framework: pytorch
+	Average: 780.7687385876974s - Median: 765.1663811206818s
+
+Framework: mlx
+	Average: 717.1385540962219s - Median: 718.111958026886s
 For inference:
 1. Benchmark whisper (native)
-2. Benchmark TinyLLama
+Framework: pytorch
+	Average: 31.998124384880064s - Median: 31.96485936641693s
 
+Framework: mlx
+	Average: 8.509361457824706s - Median: 8.509169936180115s
+2. Benchmark TinyLLama
+Framework: pytorch
+	Average: 59.274635887146s - Median: 55.8025221824646s
+
+Framework: mlx
+	Average: 33.38054447174072s - Median: 33.322925329208374s
 Extra:
 1. Switch between CPU and GPU
+Switch test: ran 10 times
+Framework: pytorch
+	Average: 349.7299320459366s - Median: 349.9100536108017s
 
+Switch test: ran 10 times
+Framework: mlx
+	Average: 270.1572776556015s - Median: 271.8326184749603s
 
 Benchmark on:
 All connected to power and with performance mode enabled

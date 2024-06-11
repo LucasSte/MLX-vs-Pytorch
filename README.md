@@ -20,8 +20,10 @@ them, please refer to section (REFERENCE HERE).
 
 ## Results
 
+TODO: Explain what the numbers mean
 TODO: Showing both the mean and median clutters the table.
 Present only the median!
+Why not the mean and stddev?
 
 <table>
     <thead>

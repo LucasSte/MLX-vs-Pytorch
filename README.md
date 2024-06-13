@@ -20,15 +20,16 @@ them, please refer to section (REFERENCE HERE).
 
 ## Results
 
-TODO: Explain what the numbers mean
-TODO: Showing both the mean and median clutters the table.
-Present only the median!
-Why not the mean and stddev?
+TODO: For information about the median, check raw.txt
 
 <table>
+<thead>
+<tr>
+<th colspan="4">M1 Pro (10 CPU core, 16 GPU core, 32 GB RAM) </th>
+</tr>
+</thead>
     <thead>
         <tr>
-            <th>Device</th>
             <th>Benchmark</th>
             <th>PyTorch time (s)</th>
             <th>MLX time (s)</th>
@@ -36,42 +37,29 @@ Why not the mean and stddev?
     </thead>
     <tbody>
         <tr>
-            <td rowspan=4>L1 Name</td>
-            <td rowspan=2>L2 Name A</td>
-            <td>L3 Name A</td>
-            <td>L3 Name A</td>
+            <td>Training a transformer <br> language model</td>
+            <td> 1806.63 </td>
+            <td> 1157.00 </td>
         </tr>
         <tr>
-            <td>L3 Name B</td>
-            <td>L3 Name B</td>
+            <td>Training BERT</td>
+            <td> 780.76 </td>
+            <td> 717.13 </td>
         </tr>
         <tr>
-            <td rowspan=2>L2 Name B</td>
-            <td>L3 Name C</td>
-            <td>L3 Name C</td>
+            <td>Whisper inference</td>
+            <td> 31.99 </td>
+            <td> 8.50 </td>
         </tr>
         <tr>
-            <td>L3 Name D</td>
-            <td>L3 Name D</td>
-        </tr>
-<tr>
-            <td rowspan=4>L1 Name</td>
-            <td rowspan=2>L2 Name A</td>
-            <td>L3 Name A</td>
-            <td>L3 Name A</td>
+            <td>TinyLLama inference</td>
+            <td> 59.27 </td>
+            <td> 33.38 </td>
         </tr>
         <tr>
-            <td>L3 Name B</td>
-            <td>L3 Name B</td>
-        </tr>
-        <tr>
-            <td rowspan=2>L2 Name B</td>
-            <td>L3 Name C</td>
-            <td>L3 Name C</td>
-        </tr>
-        <tr>
-            <td>L3 Name D</td>
-            <td>L3 Name D</td>
+            <td>CPU/GPU switch</td>
+            <td> 349.72 </td>
+            <td> 270.15 </td>
         </tr>
     </tbody>
 </table>

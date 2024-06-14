@@ -6,7 +6,7 @@ intelligence frameworks that work on Apple Silicon devices: MLX and PyTorch.
 The idea behind this simple project is to enable a wise choice when starting an
 AI project in an Apple computer.
 
-We've run five benchmarks several times to emulate a day-to-day usage. For more information about
+We ran five benchmarks several times to emulate a day-to-day usage. For more information about
 them, please refer to section (REFERENCE HERE).
 
 1. Training a transformers language model.
@@ -20,7 +20,13 @@ them, please refer to section (REFERENCE HERE).
 
 ## Results
 
-TODO: For information about the median, check raw.txt
+We executed the tests for ten iterations each, except the language model training
+and the BERT training ones, for which we ran only three iterations due to the
+extra time they took.
+
+The results on the tables below show the average time for the iterations we ran.
+For information about the median of the execution times for each benchmark, refer
+to [raw_results.txt](raw_results.txt).
 
 <table>
 <thead>
@@ -63,3 +69,54 @@ TODO: For information about the median, check raw.txt
         </tr>
     </tbody>
 </table>
+
+<table>
+<thead>
+<tr>
+<th colspan="4">M3 Max (16 CPU core, 40 GPU core, 48 GB RAM) </th>
+</tr>
+</thead>
+    <thead>
+        <tr>
+            <th>Benchmark</th>
+            <th>PyTorch time (s)</th>
+            <th>MLX time (s)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Training a transformer <br> language model</td>
+            <td> 912.52 </td>
+            <td> 426.00 </td>
+        </tr>
+        <tr>
+            <td>Training BERT</td>
+            <td> 536.90 </td>
+            <td> 409.20 </td>
+        </tr>
+        <tr>
+            <td>Whisper inference</td>
+            <td> 17.90 </td>
+            <td> 4.85 </td>
+        </tr>
+        <tr>
+            <td>TinyLLama inference</td>
+            <td> 36.18 </td>
+            <td> 15.41 </td>
+        </tr>
+        <tr>
+            <td>CPU/GPU switch</td>
+            <td> 146.35 </td>
+            <td> 140.51 </td>
+        </tr>
+    </tbody>
+</table>
+
+---
+
+## How to run the benchmarks
+
+
+---
+
+##  Details about each benchmark

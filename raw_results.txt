@@ -1,0 +1,103 @@
+
+============================= M1 Pro =============================
+
+---- Training a transformers language model ----
+=> Values from three executions
+
+Framework: pytorch
+	Average: 1806.639595190684s - Median: 1818.6110489368439s
+
+Framework: mlx
+	Average: 1157.0066788196564s - Median: 1154.6633532047272s
+
+
+---- Training BERT ----
+=> Values from three executions
+
+Framework: pytorch
+	Average: 780.7687385876974s - Median: 765.1663811206818s
+
+Framework: mlx
+	Average: 717.1385540962219s - Median: 718.111958026886s
+
+
+---- Whisper inference ----
+=> Values from ten executions
+
+Framework: pytorch
+	Average: 31.998124384880064s - Median: 31.96485936641693s
+
+Framework: mlx
+	Average: 8.509361457824706s - Median: 8.509169936180115s
+
+---- TinyLLama inference ----
+=> Values from ten executions
+
+Framework: pytorch
+	Average: 59.274635887146s - Median: 55.8025221824646s
+
+Framework: mlx
+	Average: 33.38054447174072s - Median: 33.322925329208374s
+
+---- CPU/GPU switch ----
+=> Values from ten executions
+
+Framework: pytorch
+	Average: 349.7299320459366s - Median: 349.9100536108017s
+
+Framework: mlx
+	Average: 270.1572776556015s - Median: 271.8326184749603s
+
+==================================================================
+
+
+============================= M3 Max =============================
+
+---- Training a transformers language model ----
+=> Values from three executions
+
+Framework: pytorch
+	Average: 912.5205717086792s - Median: 924.3736660480499s
+
+Framework: mlx
+	Average: 426.00355768203735s - Median: 426.1944200992584s
+
+
+---- Training BERT ----
+=> Values from three executions
+
+Framework: pytorch
+	Average: 536.9084160327911s - Median: 537.460841178894s
+
+Framework: mlx
+	Average: 409.2550208568573s - Median: 409.42770981788635s
+
+
+---- Whisper inference ----
+=> Values from ten executions
+
+Framework: pytorch
+	Average: 17.909158730506896s - Median: 17.877812027931213s
+
+Framework: mlx
+	Average: 4.8507798433303835s - Median: 4.839159846305847s
+
+---- TinyLLama inference ----
+=> Values from ten executions
+
+Framework: pytorch
+	Average: 36.182030129432675s - Median: 34.26037609577179s
+
+Framework: mlx
+	Average: 15.41469841003418s - Median: 15.389396786689758s
+
+---- CPU/GPU switch ----
+=> Values from ten executions
+
+Framework: pytorch
+	Average: 146.35703275203704s - Median: 146.41792500019073s
+
+Framework: mlx
+	Average: 140.5102721452713s - Median: 140.51127195358276s
+
+==================================================================

@@ -16,7 +16,6 @@ them, please refer to section (REFERENCE HERE).
 5. A synthetic benchmark that moves data between CPU and GPU for 
    matrix multiplication.
 
----
 
 ## Results
 
@@ -112,11 +111,9 @@ to [raw_results.txt](raw_results.txt).
     </tbody>
 </table>
 
----
 
 ## How to run the benchmarks
 
 
----
 
 ##  Details about each benchmark

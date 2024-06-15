@@ -144,3 +144,15 @@ The `whisper_inference` benchmark only works with the latest commit from the Pyt
 sources to run this benchmark.
 
 ##  Details about each benchmark
+
+### Training a transformers langauge model
+
+For this benchmark, we copied the model from MLX's [TransformerLM example](https://github.com/ml-explore/mlx-examples/blob/a7598e9456c6455a07ff4905712c2ea3cfcd52db/transformer_lm/main.py#L15).
+For the Pytorch version, we utilized the closest functions available to properly replicate the model in another framework.
+The dataset utilized is the [PTB corpus](https://paperswithcode.com/dataset/penn-treebank). For more information about
+the model size, epochs and other hyperparameters, refer to [lm_train.py](lm_train.py).
+
+### Training/fine-tuning BERT
+
+RUN THIS ONE AGAIN!
+This is the [BERT-tiny model](https://huggingface.co/prajjwal1/bert-tiny)

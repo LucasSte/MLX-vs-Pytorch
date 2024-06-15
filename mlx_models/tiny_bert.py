@@ -8,7 +8,7 @@ from torch.utils.data import DataLoader
 import mlx.nn as nn
 import mlx.core as mx
 
-from pytorch_models.MiniBERT import Config
+from pytorch_models.tiny_bert import Config
 
 
 class LayerNorm(nn.Module):
@@ -161,7 +161,7 @@ class BertFineTuneTask(nn.Module):
     def __init__(self, num_labels, bert_config):
         super(BertFineTuneTask, self).__init__()
         self.bert = MiniBert(bert_config)
-        self.linear1 = nn.Linear(3 * self.bert.config.hidden_size, num_labels)
+        self.linear1 = nn.Linear(4 * self.bert.config.hidden_size, num_labels)
 
     def __call__(self, input_ids, attention_mask):
         input_ids = input_ids.reshape(input_ids.shape[0] * 2, input_ids.shape[2])
@@ -174,8 +174,16 @@ class BertFineTuneTask(nn.Module):
             bert_output[1].shape[0] // 2, 2, bert_output[1].shape[1]
         )
 
+        set_1_embeds = embeds[:, 0]
+        set_2_embeds = embeds[:, 1]
         concat = mx.concatenate(
-            (embeds[:, 0], embeds[:, 1], mx.abs(embeds[:, 0] - embeds[:, 1])), axis=-1
+            (
+                set_1_embeds,
+                set_2_embeds,
+                mx.abs(set_1_embeds - set_2_embeds),
+                mx.multiply(set_1_embeds, set_2_embeds),
+            ),
+            axis=-1,
         )
 
         lin = self.linear1(concat)

@@ -201,7 +201,7 @@ class BertFineTuneTask(nn.Module):
     def __init__(self, num_labels, bert_config):
         super(BertFineTuneTask, self).__init__()
         self.bert = MiniBert(bert_config)
-        self.linear1 = torch.nn.Linear(3 * self.bert.config.hidden_size, num_labels)
+        self.linear1 = torch.nn.Linear(4 * self.bert.config.hidden_size, num_labels)
         self.loss_func = torch.nn.CrossEntropyLoss()
 
     def forward(self, input_ids, attention_mask, ground_truth):
@@ -215,8 +215,16 @@ class BertFineTuneTask(nn.Module):
             bert_output[1].size(0) // 2, 2, bert_output[1].size(1)
         )
 
+        set_1_embeds = embeds[:, 0]
+        set_2_embeds = embeds[:, 1]
         concat = torch.cat(
-            (embeds[:, 0], embeds[:, 1], torch.abs(embeds[:, 0] - embeds[:, 1])), dim=-1
+            (
+                set_1_embeds,
+                set_2_embeds,
+                torch.abs(set_1_embeds - set_2_embeds),
+                torch.mul(set_1_embeds, set_2_embeds),
+            ),
+            dim=-1,
         )
         lin = self.linear1(concat)
         loss = self.loss_func(lin, ground_truth)

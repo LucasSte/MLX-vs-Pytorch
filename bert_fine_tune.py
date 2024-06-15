@@ -1,7 +1,7 @@
 from dataset.BERT import load_nli
 from utils.initializer import initialize
-from pytorch_models.MiniBERT import train as pytorch_train
-from mlx_models.MiniBERT import train as mlx_train
+from pytorch_models.tiny_bert import train as pytorch_train
+from mlx_models.tiny_bert import train as mlx_train
 import numpy as np
 import time
 

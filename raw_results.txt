@@ -15,9 +15,9 @@ Framework: mlx
 => Values from three executions
 
 Framework: pytorch
-	Average: 780.7687385876974s - Median: 765.1663811206818s
+	Average: 751.028749704361s - Median: 753.6784768104553s
 
-Framework: mlx
+Framework: mlx - Outdated!
 	Average: 717.1385540962219s - Median: 718.111958026886s
 
 
@@ -66,10 +66,10 @@ Framework: mlx
 ---- Training BERT ----
 => Values from three executions
 
-Framework: pytorch
+Framework: pytorch - Outdated
 	Average: 536.9084160327911s - Median: 537.460841178894s
 
-Framework: mlx
+Framework: mlx - Outdated
 	Average: 409.2550208568573s - Median: 409.42770981788635s
 
 

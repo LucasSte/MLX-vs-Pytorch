@@ -7,14 +7,14 @@ The idea behind this simple project is to enable a wise choice when starting an
 AI project in an Apple computer.
 
 We ran five benchmarks several times to emulate a day-to-day usage. For more information about
-them, please refer to section (REFERENCE HERE).
+them, please refer to section [Details about each benchmark](#details-about-each-benchmark).
 
-1. Training a transformers language model.
-2. Training/fine-tuning BERT.
-3. Inference using OpenAI's whisper model.
-4. Language model inference using TinyLLama.
+1. Training a transformers language model (`lm_train.py`).
+2. Training/fine-tuning BERT (`bert_fine_tune.py`).
+3. Inference using OpenAI's whisper model (`whisper_inference.py`).
+4. Language model inference using TinyLLama (`llm_inference.py`).
 5. A synthetic benchmark that moves data between CPU and GPU for 
-   matrix multiplication.
+   matrix multiplication (`switch_test.py`).
 
 
 ## Results
@@ -114,6 +114,33 @@ to [raw_results.txt](raw_results.txt).
 
 ## How to run the benchmarks
 
+First, make sure you have git LFS installed so that you can configure your repository:
 
+```
+pip3 install -r requirements.txt
+cd pytorch_models
+./configure.sh
+cd .. 
+cd mlx_models
+./configure.sh
+```
+
+Every Python file in the root folder represents a different benchmark. All of them require two arguments: the number
+of times to run the benchmark and the framework. If you'd like to run, for example, the TinyLLama inference benchmark
+ten times using pytorch, run:
+
+```
+python3 llm_inference.py --framework pytorch --iter 10
+```
+
+When the command finishes, it will print on the terminal the average and median times of the ten iterations.
+
+### Additional settings
+
+The `lm_train.py` benchmark needs the `PYTORCH_MPS_HIGH_WATERMARK_RATIO` environment variable set to zero when used with
+pytorch.
+
+The `whisper_inference` benchmark only works with the latest commit from the Pytorch repository, so build it from 
+sources to run this benchmark.
 
 ##  Details about each benchmark

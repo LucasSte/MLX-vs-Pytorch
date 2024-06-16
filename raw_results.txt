@@ -17,8 +17,8 @@ Framework: mlx
 Framework: pytorch
 	Average: 751.028749704361s - Median: 753.6784768104553s
 
-Framework: mlx - Outdated!
-	Average: 717.1385540962219s - Median: 718.111958026886s
+Framework: mlx
+	Average: 718.3554696242014s - Median: 718.211642742157s
 
 
 ---- Whisper inference ----

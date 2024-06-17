@@ -66,11 +66,11 @@ Framework: mlx
 ---- Training BERT ----
 => Values from three executions
 
-Framework: pytorch - Outdated
-	Average: 536.9084160327911s - Median: 537.460841178894s
+Framework: pytorch
+	Average: 550.2911033630371s - Median: 544.6988077163696s
 
-Framework: mlx - Outdated
-	Average: 409.2550208568573s - Median: 409.42770981788635s
+Framework: mlx
+	Average: 408.45258100827533s - Median: 408.62774896621704s
 
 
 ---- Whisper inference ----

@@ -48,8 +48,8 @@ to [raw_results.txt](raw_results.txt).
         </tr>
         <tr>
             <td>Training BERT</td>
-            <td> 780.76 </td>
-            <td> 717.13 </td>
+            <td> 751.02 </td>
+            <td> 718.35 </td>
         </tr>
         <tr>
             <td>Whisper inference</td>
@@ -90,8 +90,8 @@ to [raw_results.txt](raw_results.txt).
         </tr>
         <tr>
             <td>Training BERT</td>
-            <td> 536.90 </td>
-            <td> 409.20 </td>
+            <td> 550.29 </td>
+            <td> 408.45 </td>
         </tr>
         <tr>
             <td>Whisper inference</td>
@@ -154,5 +154,4 @@ the model size, epochs and other hyperparameters, refer to [lm_train.py](lm_trai
 
 ### Training/fine-tuning BERT
 
-RUN THIS ONE AGAIN!
 This is the [BERT-tiny model](https://huggingface.co/prajjwal1/bert-tiny)

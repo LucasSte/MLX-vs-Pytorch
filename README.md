@@ -127,7 +127,7 @@ cd mlx_models
 
 Every Python file in the root folder represents a different benchmark. All of them require two arguments: the number
 of times to run the benchmark and the framework. If you'd like to run, for example, the TinyLLama inference benchmark
-ten times using pytorch, run:
+ten times using PyTorch, run:
 
 ```
 python3 llm_inference.py --framework pytorch --iter 10
@@ -138,9 +138,9 @@ When the command finishes, it will print on the terminal the average and median 
 ### Additional settings
 
 The `lm_train.py` benchmark needs the `PYTORCH_MPS_HIGH_WATERMARK_RATIO` environment variable set to zero when used with
-pytorch.
+PyTorch.
 
-The `whisper_inference` benchmark only works with the latest commit from the Pytorch repository, so build it from 
+The `whisper_inference` benchmark only works with the latest commit from the PyTorch repository, so build it from 
 sources to run this benchmark.
 
 ##  Details about each benchmark
@@ -148,10 +148,46 @@ sources to run this benchmark.
 ### Training a transformers langauge model
 
 For this benchmark, we copied the model from MLX's [TransformerLM example](https://github.com/ml-explore/mlx-examples/blob/a7598e9456c6455a07ff4905712c2ea3cfcd52db/transformer_lm/main.py#L15).
-For the Pytorch version, we utilized the closest functions available to properly replicate the model in another framework.
+For the PyTorch version, we utilized the closest functions available to properly replicate the model in another framework.
 The dataset utilized is the [PTB corpus](https://paperswithcode.com/dataset/penn-treebank). For more information about
 the model size, epochs and other hyperparameters, refer to [lm_train.py](lm_train.py).
 
 ### Training/fine-tuning BERT
 
-This is the [BERT-tiny model](https://huggingface.co/prajjwal1/bert-tiny)
+This is the [BERT-tiny model](https://huggingface.co/prajjwal1/bert-tiny) adapted to classify pairs of sentences as
+having a contradiction, entailment or neutral relation. The model is exactly the one presented in 
+[Conneau et al](https://arxiv.org/pdf/1705.02364). It was implemented in pure PyTorch and pure MLX respectively.
+
+The only adaptation in this case was that we used PyTorch dataloader for the MLX model too, as it was compatible with 
+the tokenizer library. Even though the data loader creates a PyTorch tensor for each input, we can transform it to a 
+numpy array without extra copies, so this setting did not harm the MLX setting.
+
+### Whisper inference
+
+For the PyTorch setting, we used HuggingFace transformers library to download and execute the tiny whisper model. For 
+the MLX benchmark, we used the [MLX examples tools](https://github.com/ml-explore/mlx-examples/tree/main/whisper) to
+download tiny whisper and convert it to the MLX format, using `float32` as the inner data type to match that of PyTorch
+(see [mlx_models/configure.sh](mlx_models/configure.sh)).
+
+### TinyLLama inference
+
+For PyTorch, we downloaded the `TinyLlama-1.1B-Chat-v1.0` model from the HuggingFace repository
+(see [pytorch_models/configure.sh](pytorch_models/configure.sh)), and use the transformers library to load and execute the model.
+
+For MLX, we convert the model to the MLX format using the [MLX examples tools](https://github.com/ml-explore/mlx-examples/tree/main/llms/llama),
+and use `float32` as the data type to match that of PyTorch. We utilize the execution script from the 
+[MLX examples repository](https://github.com/ml-explore/mlx-examples/blob/main/llms/llama/llama.py) with several adaptations
+to account for the proper prompt formatting and execution constraints.
+
+
+### CPU/GPU switch
+
+In this benchmark, we perform matrix multiplications in a loop. First, we multiply matrices in the CPU, then we
+multiply the results in the GPU. Lastly, we reuse the results from the latter as the input for the next iteration's
+CPU multiplication.
+
+The idea behind this benchmark is to assess how effective are each framework's mechanisms to move data (or just switch
+processor in the case of MLX) between execution units. 
+
+
+

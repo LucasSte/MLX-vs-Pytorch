@@ -4,7 +4,7 @@ This repository contains benchmarks for comparing two popular artificial
 intelligence frameworks that work on Apple Silicon devices: MLX and PyTorch.
 
 The idea behind this simple project is to enable a wise choice when starting an
-AI project in an Apple computer.
+AI project on an Apple computer.
 
 We ran five benchmarks several times to emulate a day-to-day usage. For more information about
 them, please refer to section [Details about each benchmark](#details-about-each-benchmark).
@@ -127,7 +127,7 @@ cd mlx_models
 
 Every Python file in the root folder represents a different benchmark. All of them require two arguments: the number
 of times to run the benchmark and the framework. If you'd like to run, for example, the TinyLLama inference benchmark
-ten times using PyTorch, run:
+ten times using PyTorch, execute:
 
 ```
 python3 llm_inference.py --framework pytorch --iter 10
@@ -154,13 +154,14 @@ the model size, epochs and other hyperparameters, refer to [lm_train.py](lm_trai
 
 ### Training/fine-tuning BERT
 
-This is the [BERT-tiny model](https://huggingface.co/prajjwal1/bert-tiny) adapted to classify pairs of sentences as
-having a contradiction, entailment or neutral relation. The model is exactly the one presented in 
-[Conneau et al](https://arxiv.org/pdf/1705.02364). It was implemented in pure PyTorch and pure MLX respectively.
+We utilized the model presented in [Conneau et al](https://arxiv.org/pdf/1705.02364), using the 
+[BERT-tiny model](https://huggingface.co/prajjwal1/bert-tiny) for the respective BERT blocks. It classifies pairs of
+sentences as  having a contradiction, entailment or neutral relation. It was implemented in pure PyTorch and pure 
+MLX respectively. We do not initialize it with any pre-trained weights, so the benchmark can be seen as pure training.
 
 The only adaptation in this case was that we used PyTorch dataloader for the MLX model too, as it was compatible with 
 the tokenizer library. Even though the data loader creates a PyTorch tensor for each input, we can transform it to a 
-numpy array without extra copies, so this setting did not harm the MLX setting.
+numpy array without extra copies, so this setting did not harm the MLX results.
 
 ### Whisper inference
 
@@ -183,11 +184,11 @@ to account for the proper prompt formatting and execution constraints.
 ### CPU/GPU switch
 
 In this benchmark, we perform matrix multiplications in a loop. First, we multiply matrices in the CPU, then we
-multiply the results in the GPU. Lastly, we reuse the results from the latter as the input for the next iteration's
-CPU multiplication.
+multiply the resulting matrices in the GPU. Lastly, we reuse the results from the latter as the input
+for the next iteration's CPU multiplication.
 
-The idea behind this benchmark is to assess how effective are each framework's mechanisms to move data (or just switch
-processor in the case of MLX) between execution units. 
+The idea behind this benchmark is to assess how effective each framework's mechanisms are to move data between
+execution units. 
 
 
 

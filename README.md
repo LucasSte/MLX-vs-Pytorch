@@ -158,6 +158,7 @@ We utilized the model presented in [Conneau et al](https://arxiv.org/pdf/1705.02
 [BERT-tiny model](https://huggingface.co/prajjwal1/bert-tiny) for the respective BERT blocks. It classifies pairs of
 sentences as  having a contradiction, entailment or neutral relation. It was implemented in pure PyTorch and pure 
 MLX respectively. We do not initialize it with any pre-trained weights, so the benchmark can be seen as pure training.
+The dataset for training was the [NLI dataset](https://sbert.net/datasets/AllNLI.tsv.gz).
 
 The only adaptation in this case was that we used PyTorch dataloader for the MLX model too, as it was compatible with 
 the tokenizer library. Even though the data loader creates a PyTorch tensor for each input, we can transform it to a 
@@ -168,7 +169,8 @@ numpy array without extra copies, so this setting did not harm the MLX results.
 For the PyTorch setting, we used HuggingFace transformers library to download and execute the tiny whisper model. For 
 the MLX benchmark, we used the [MLX examples tools](https://github.com/ml-explore/mlx-examples/tree/main/whisper) to
 download tiny whisper and convert it to the MLX format, using `float32` as the inner data type to match that of PyTorch
-(see [mlx_models/configure.sh](mlx_models/configure.sh)).
+(see [mlx_models/configure.sh](mlx_models/configure.sh)). The inference code for MLX leverages the `mlx_whisper` 
+library.
 
 ### TinyLLama inference
 

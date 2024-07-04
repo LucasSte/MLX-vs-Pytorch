@@ -50,6 +50,62 @@ Framework: mlx
 
 ==================================================================
 
+============================= M1 Max =============================
+====================== 64GB Unified Memory =======================
+==================== 10 CPU and 32 GPU Cores =====================
+
+---- Training a transformers language model ----
+=> Values from three executions
+
+Framework: pytorch
+	Average: 
+
+Framework: mlx
+	Average: 
+
+
+---- Training BERT ----
+=> Values from three executions
+
+Framework: pytorch
+	Average: 
+
+Framework: mlx
+	Average: 
+
+
+---- Whisper inference ----
+=> Values from ten executions
+
+Framework: pytorch 
+(Had to "export PYTORCH_ENABLE_MPS_FALLBACK=1" due to an "op not implemented on MPS" error)
+	Average: 21.43549997806549s - Median: 21.204530119895935s
+
+Framework: mlx
+	Average: 6.946336317062378s - Median: 6.937196493148804s
+
+
+---- TinyLLama inference ----
+=> Values from ten executions
+
+Framework: pytorch
+	Average: 50.98743650913239s - Median: 47.73779845237732s
+
+Framework: mlx
+	Average: 20.61291913986206s - Median: 20.613165140151978s
+
+
+---- CPU/GPU switch ----
+=> Values from ten executions
+
+Framework: pytorch
+	Average: 251.71098244190216s - Median: 252.021404504776s
+
+Framework: mlx
+	Average: Framework: mlx
+	Average: 214.5735635280609s - Median: 214.57463908195496s
+
+==================================================================
 
 ============================= M3 Max =============================
 

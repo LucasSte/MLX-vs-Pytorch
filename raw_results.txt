@@ -58,17 +58,18 @@ Framework: mlx
 => Values from three executions
 
 Framework: pytorch
-	Average: 
+	Average: - 
+	Error: RuntimeError: MPS backend out of memory (MPS allocated: 78.01 GB, other allocations: 2.38 GB, max allowed: 81.60 GB). Tried to allocate 2.00 GB on private pool. Use PYTORCH_MPS_HIGH_WATERMARK_RATIO=0.0 to disable upper limit for memory allocations (may cause system failure)
 
 Framework: mlx
-	Average: 
+	Average: 752.2592077255249s - Median: 752.2592812234227s
 
 
 ---- Training BERT ----
 => Values from three executions
 
 Framework: pytorch
-	Average: 1136.4159963925679s - Median: 793.610111951828s
+	Average: 793.6759963925679s - Median: 793.610111951828s
 
 Framework: mlx
 	Average: 499.343544960022s - Median: 498.0613958835602s

@@ -72,6 +72,48 @@ to [raw_results.txt](raw_results.txt).
 <table>
 <thead>
 <tr>
+<th colspan="4">M1 Max (10 CPU core, 32 GPU core, 64 GB RAM) </th>
+</tr>
+</thead>
+    <thead>
+        <tr>
+            <th>Benchmark</th>
+            <th>PyTorch time (s)</th>
+            <th>MLX time (s)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Training a transformer <br> language model</td>
+            <td> OOM Error </td>
+            <td> 752.25 </td>
+        </tr>
+        <tr>
+            <td>Training BERT</td>
+            <td> 793.67 </td>
+            <td> 499.34 </td>
+        </tr>
+        <tr>
+            <td>Whisper inference</td>
+            <td> 21.43 </td>
+            <td> 6.95 </td>
+        </tr>
+        <tr>
+            <td>TinyLLama inference</td>
+            <td> 50.98 </td>
+            <td> 20.61 </td>
+        </tr>
+        <tr>
+            <td>CPU/GPU switch</td>
+            <td> 251.71 </td>
+            <td> 214.57 </td>
+        </tr>
+    </tbody>
+</table>
+
+<table>
+<thead>
+<tr>
 <th colspan="4">M3 Max (16 CPU core, 40 GPU core, 48 GB RAM) </th>
 </tr>
 </thead>

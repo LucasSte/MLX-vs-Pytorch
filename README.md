@@ -85,7 +85,7 @@ to [raw_results.txt](raw_results.txt).
     <tbody>
         <tr>
             <td>Training a transformer <br> language model</td>
-            <td> OOM Error </td>
+            <td> 1106.75 </td>
             <td> 752.25 </td>
         </tr>
         <tr>
@@ -95,7 +95,7 @@ to [raw_results.txt](raw_results.txt).
         </tr>
         <tr>
             <td>Whisper inference</td>
-            <td> 21.43 </td>
+            <td> 21.28 </td>
             <td> 6.95 </td>
         </tr>
         <tr>

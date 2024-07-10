@@ -51,15 +51,12 @@ Framework: mlx
 ==================================================================
 
 ============================= M1 Max =============================
-====================== 64GB Unified Memory =======================
-==================== 10 CPU and 32 GPU Cores =====================
 
 ---- Training a transformers language model ----
 => Values from three executions
 
 Framework: pytorch
-	Average: - 
-	Error: RuntimeError: MPS backend out of memory (MPS allocated: 78.01 GB, other allocations: 2.38 GB, max allowed: 81.60 GB). Tried to allocate 2.00 GB on private pool. Use PYTORCH_MPS_HIGH_WATERMARK_RATIO=0.0 to disable upper limit for memory allocations (may cause system failure)
+	Average: 1106.7549295464829s - Median: 1101.3749282211793s
 
 Framework: mlx
 	Average: 752.2592077255249s - Median: 752.2592812234227s
@@ -79,8 +76,7 @@ Framework: mlx
 => Values from ten executions
 
 Framework: pytorch 
-(Had to "export PYTORCH_ENABLE_MPS_FALLBACK=1" due to an "op not implemented on MPS" error)
-	Average: 21.43549997806549s - Median: 21.204530119895935s
+	Average: 21.27653947197935s - Median: 21.204530119895964s
 
 Framework: mlx
 	Average: 6.946336317062378s - Median: 6.937196493148804s

@@ -81,7 +81,6 @@ Framework: pytorch
 Framework: mlx
 	Average: 6.946336317062378s - Median: 6.937196493148804s
 
-
 ---- TinyLLama inference ----
 => Values from ten executions
 
@@ -101,7 +100,6 @@ Framework: pytorch
 Framework: mlx
 	Average: Framework: mlx
 	Average: 214.5735635280609s - Median: 214.57463908195496s
-
 ==================================================================
 
 ============================= M3 Max =============================

@@ -30,6 +30,7 @@ Framework: pytorch
 Framework: mlx
 	Average: 8.509361457824706s - Median: 8.509169936180115s
 
+
 ---- TinyLLama inference ----
 => Values from ten executions
 
@@ -38,6 +39,7 @@ Framework: pytorch
 
 Framework: mlx
 	Average: 33.38054447174072s - Median: 33.322925329208374s
+
 
 ---- CPU/GPU switch ----
 => Values from ten executions
@@ -50,6 +52,58 @@ Framework: mlx
 
 ==================================================================
 
+============================= M1 Max =============================
+
+---- Training a transformers language model ----
+=> Values from three executions
+
+Framework: pytorch
+	Average: 1106.7549295464829s - Median: 1101.3749282211793s
+
+Framework: mlx
+	Average: 752.2592077255249s - Median: 752.2592812234227s
+
+
+---- Training BERT ----
+=> Values from three executions
+
+Framework: pytorch
+	Average: 793.6759963925679s - Median: 793.610111951828s
+
+Framework: mlx
+	Average: 499.343544960022s - Median: 498.0613958835602s
+
+
+---- Whisper inference ----
+=> Values from ten executions
+
+Framework: pytorch 
+	Average: 21.27653947197935s - Median: 21.204530119895964s
+
+Framework: mlx
+	Average: 6.946336317062378s - Median: 6.937196493148804s
+
+
+---- TinyLLama inference ----
+=> Values from ten executions
+
+Framework: pytorch
+	Average: 50.98743650913239s - Median: 47.73779845237732s
+
+Framework: mlx
+	Average: 20.61291913986206s - Median: 20.613165140151978s
+
+
+---- CPU/GPU switch ----
+=> Values from ten executions
+
+Framework: pytorch
+	Average: 251.71098244190216s - Median: 252.021404504776s
+
+Framework: mlx
+	Average: 214.5735635280609s - Median: 214.57463908195496s
+
+==================================================================
 
 ============================= M3 Max =============================
 
@@ -82,6 +136,7 @@ Framework: pytorch
 Framework: mlx
 	Average: 4.8507798433303835s - Median: 4.839159846305847s
 
+
 ---- TinyLLama inference ----
 => Values from ten executions
 
@@ -90,6 +145,7 @@ Framework: pytorch
 
 Framework: mlx
 	Average: 15.41469841003418s - Median: 15.389396786689758s
+
 
 ---- CPU/GPU switch ----
 => Values from ten executions

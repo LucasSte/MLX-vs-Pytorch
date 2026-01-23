@@ -50,7 +50,7 @@ requests==2.32.4
 safetensors==0.4.3
 scikit-learn==1.5.0
 scipy==1.13.0
-sentencepiece==0.2.0
+sentencepiece==0.2.1
 six==1.16.0
 soundfile==0.12.1
 soxr==0.3.7

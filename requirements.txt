@@ -39,7 +39,7 @@ pathspec==0.12.1
 platformdirs==4.2.1
 pooch==1.8.1
 psutil==5.9.8
-pyarrow==16.0.0
+pyarrow==23.0.1
 pyarrow-hotfix==0.6
 pycparser==2.22
 python-dateutil==2.9.0.post0
